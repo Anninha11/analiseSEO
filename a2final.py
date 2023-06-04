@@ -93,5 +93,5 @@ if botao:
     fig = mpl.pyplot.figure(figsize=(10, 4))
     sns.barplot(x='Valor Site 1', y='Categoria', data=dataframe, color='blue', label='Site 1')
     sns.barplot(x='Valor Site 2', y='Categoria', data=dataframe, color='red', label='Site 2')
-    plt.legend()
+    mpl.legend()
     st.pyplot(fig)
