@@ -84,22 +84,30 @@ if botao:
 
     
     categorias = ['Header', 'Autor', 'Keywords', 'Definição', 'Tags "og"', 'Idioma']
-    valores1 = [resultado1['tem_header'], resultado1['tem_autor'], resultado1['tem_keywords'],
-               resultado1['tem_definicao'], resultado1['tem_tags_og'], resultado1['tem_idioma']]
-    valores2 = [resultado2['tem_header'], resultado2['tem_autor'], resultado2['tem_keywords'],
-               resultado2['tem_definicao'], resultado2['tem_tags_og'], resultado2['tem_idioma']]
-    dataframe = pd.DataFrame({'Categoria': categorias, 'Valor Site 1': valores1, 'Valor Site 2': valores2})
-    fig = plt.subplots(figsize=(10, 4))
-    sns.barplot(x='Valor Site 1', y='Categoria', data=dataframe, color='blue', label='Site 1')
-    sns.barplot(x='Valor Site 2', y='Categoria', data=dataframe, color='red', label='Site 2')
-    for i, valor1, valor2 in zip(range(len(categorias)), valores1, valores2):
-        if valor1 and valor2:
-            plt.text(i, valor1 / 2, 'Ambos', ha='center', va='center')
-            plt.text(i, valor1 + valor2 / 2, 'Ambos', ha='center', va='center')
-    plt.legend()
-    st.pyplot(fig)
+    valores_site1 = [resultado_site1['tem_header'], resultado_site1['tem_autor'], resultado_site1['tem_keywords'],
+                     resultado_site1['tem_definicao'], resultado_site1['tem_tags_og'], resultado_site1['tem_idioma']]
+    valores_site2 = [resultado_site2['tem_header'], resultado_site2['tem_autor'], resultado_site2['tem_keywords'],
+                     resultado_site2['tem_definicao'], resultado_site2['tem_tags_og'], resultado_site2['tem_idioma']]
+    valores_site1_e_2 = [resultado_site1_e_2['tem_header'], resultado_site1_e_2['tem_autor'],
+                         resultado_site1_e_2['tem_keywords'], resultado_site1_e_2['tem_definicao'],
+                         resultado_site1_e_2['tem_tags_og'], resultado_site1_e_2['tem_idioma']]
 
-    buffer = io.BytesIO()
-    st.savefig(buffer, format='png')
-    buffer.seek(0)
-    st.image(buffer, use_column_width=True)
+    df = pd.DataFrame({'Categoria': categorias, 'Site 1': valores_site1, 'Site 2': valores_site2,
+                       'Site 1 e 2': valores_site1_e_2})
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bar_width = 0.2
+    index = np.arange(len(categorias))
+
+    ax.bar(index, df['Site 1'], bar_width, label='Site 1')
+    ax.bar(index + bar_width, df['Site 2'], bar_width, label='Site 2')
+    ax.bar(index + 2 * bar_width, df['Site 1 e 2'], bar_width, label='Site 1 e 2')
+
+    ax.set_xlabel('Categorias')
+    ax.set_ylabel('Valores')
+    ax.set_title('Análise de Sites')
+    ax.set_xticks(index + bar_width)
+    ax.set_xticklabels(categorias)
+    ax.legend()
+
+    st.pyplot(fig)
