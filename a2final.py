@@ -5,6 +5,7 @@ import streamlit as st
 from bs4 import BeautifulSoup
 import seaborn as sns
 import matplotlib.pyplot as plt
+import io
 
 def analisar_site(url):
     response = requests.get(url)
@@ -97,3 +98,8 @@ if botao:
             plt.text(i, valor1 + valor2 / 2, 'Ambos', ha='center', va='center')
     plt.legend()
     st.pyplot(fig)
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    st.image(buffer, use_column_width=True)
