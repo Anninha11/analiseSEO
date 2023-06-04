@@ -100,6 +100,6 @@ if botao:
     st.pyplot(fig)
 
     buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
+    st.savefig(buffer, format='png')
     buffer.seek(0)
     st.image(buffer, use_column_width=True)
