@@ -41,7 +41,7 @@ def calcular_nota_final(resultado):
         resultado['tem_definicao'] +
         resultado['tem_tags_og'] +
         resultado['tem_idioma']
-    ) / 6.0  
+    )  
     return nota_final
 
 st.title("Análise de Sites")
