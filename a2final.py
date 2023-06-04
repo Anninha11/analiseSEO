@@ -91,6 +91,9 @@ if botao:
     fig = mpl.pyplot.figure(figsize=(10, 4))
     sns.barplot(x='Valor Site 1', y='Categoria', data=dataframe, color='blue', label='Site 1')
     sns.barplot(x='Valor Site 2', y='Categoria', data=dataframe, color='red', label='Site 2')
-    sns.barplot(x='Valor Sites 1 e 2', y='Categoria', data=dataframe, color='purple', label='Site 1 e 2'
+    for i, valor1, valor2 in zip(range(len(categorias)), valores1, valores2):
+        if valor1 and valor2:
+            ax.text(i, valor1 / 2, 'Ambos', ha='center', va='center')
+            ax.text(i, valor1 + valor2 / 2, 'Ambos', ha='center', va='center')
     ax.legend()
     st.pyplot(fig)
