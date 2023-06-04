@@ -87,11 +87,9 @@ if botao:
                resultado1['tem_definicao'], resultado1['tem_tags_og'], resultado1['tem_idioma']]
     valores2 = [resultado2['tem_header'], resultado2['tem_autor'], resultado2['tem_keywords'],
                resultado2['tem_definicao'], resultado2['tem_tags_og'], resultado2['tem_idioma']]
-    
     dataframe = pd.DataFrame({'Categoria': categorias, 'Valor Site 1': valores1, 'Valor Site 2': valores2})
-    
     fig = mpl.pyplot.figure(figsize=(10, 4))
     sns.barplot(x='Valor Site 1', y='Categoria', data=dataframe, color='blue', label='Site 1')
     sns.barplot(x='Valor Site 2', y='Categoria', data=dataframe, color='red', label='Site 2')
-    mpl.legend()
+    mpl.pyplot.legend()
     st.pyplot(fig)
