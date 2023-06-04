@@ -86,7 +86,7 @@ if botao:
     
     resultado_site1 = resultado1
     resultado_site2 = resultado2
-    resltado_site1_e_2 = resultado1 + resultado2
+    resultado_site1_e_2 = resultado1 + resultado2
     categorias = ['Header', 'Autor', 'Keywords', 'Definição', 'Tags "og"', 'Idioma']
     valores_site1 = [resultado_site1['tem_header'], resultado_site1['tem_autor'], resultado_site1['tem_keywords'],
                      resultado_site1['tem_definicao'], resultado_site1['tem_tags_og'], resultado_site1['tem_idioma']]
