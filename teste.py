@@ -109,7 +109,7 @@ if len(resultados) > 0:
         st.write("")
 
     resultado_geral = {}
-    for categoria in ['tem_header', 'tem_autor', 'tem_keywords', 'tem_definicao', 'tem_tags_og', 'tem_idioma']:
+    for categoria in ['Header', 'Autor', 'Keywords', 'Definição', 'Tags "og"', 'Idioma']:
         resultado_geral[categoria] = sum(resultado[categoria] for resultado in resultados)
 
     categorias = ['Header', 'Autor', 'Keywords', 'Definição', 'Tags "og"', 'Idioma']
