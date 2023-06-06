@@ -114,4 +114,3 @@ if st.button("Analisar"):
         st.pyplot(fig)
     else:
         st.warning("Nenhum resultado encontrado.")
-
