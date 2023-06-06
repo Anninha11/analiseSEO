@@ -83,19 +83,16 @@ for url in urls:
         resultados.append(resultado)
         notas_finais.append(nota_final)
 
-    st.subheader(f"Análise do site {url}:")
-    if resultado is not None:
-        st.write("URL:", url)
-        st.write("Header:", resultado['tem_header'])
-        st.write("Autor:", resultado['tem_autor'])
-        st.write("Keywords:", resultado['tem_keywords'])
-        st.write("Definição:", resultado['tem_definicao'])
-        st.write("Tags 'og':", resultado['tem_tags_og'])
-        st.write("Definição de idioma:", resultado['tem_idioma'])
-        st.write("")
-    else:
-        st.write("URL inválida. Certifique-se de incluir um esquema válido (por exemplo, 'http://' ou 'https://').")
-        st.write("")
+for i, resultado in enumerate(resultados):
+    st.subheader(f"Análise do site {i+1}:")
+    st.write("URL:", urls[i])
+    st.write("Header:", resultado['tem_header'])
+    st.write("Autor:", resultado['tem_autor'])
+    st.write("Keywords:", resultado['tem_keywords'])
+    st.write("Definição:", resultado['tem_definicao'])
+    st.write("Tags 'og':", resultado['tem_tags_og'])
+    st.write("Definição de idioma:", resultado['tem_idioma'])
+    st.write("")
 
 for i, nota_final in enumerate(notas_finais):
     st.subheader(f"Nota Final do site {i+1}:")
@@ -109,7 +106,13 @@ for categoria in ['tem_header', 'tem_autor', 'tem_keywords', 'tem_definicao', 't
 categorias = ['Header', 'Autor', 'Keywords', 'Definição', 'Tags "og"', 'Idioma']
 valores_sites = []
 for resultado in resultados:
-    valores_sites.append([resultado[categoria] for categoria in categorias])
+    valores_site = []
+    for categoria in categorias:
+        if categoria in resultado:
+            valores_site.append(resultado[categoria])
+        else:
+            valores_site.append(0)
+    valores_sites.append(valores_site)
 valores_geral = [resultado_geral[categoria] for categoria in categorias]
 
 df = pd.DataFrame({'Categoria': categorias})
@@ -118,3 +121,4 @@ for i, url in enumerate(urls):
 df['Sites'] = valores_geral
 
 plotar_grafico_analise(df)
+
