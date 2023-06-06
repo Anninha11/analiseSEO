@@ -8,18 +8,15 @@ import matplotlib.pyplot as plt
 import io
 
 def adicionar_prefixo_url(url):
-    if not url.startswith(('http://', 'https://')):
-        url = 'http://' + url
-    return url
-
-def analisar_site(url):
-    url = adicionar_prefixo_url(url)
-
     try:
-        response = requests.get(url)
-    except requests.exceptions.RequestException:
-        st.error("Ocorreu um erro ao fazer a requisição para a URL.")
+        parsed_url = urlparse(url)
+        if not parsed_url.scheme:
+            url = 'http://' + url
+    except Exception:
+        st.error("URL inválida. Certifique-se de incluir um esquema válido (por exemplo, 'http://' ou 'https://').")
         return None
+
+    return url
 
     content = response.content
     soup = BeautifulSoup(content, 'html.parser')
