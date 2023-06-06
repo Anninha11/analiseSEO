@@ -65,10 +65,11 @@ urls = st.text_area("Coloque as URLs (uma por linha):")
 
 if st.button("Analisar"):
     urls = urls.split("\n")
+    urls = [url.strip() for url in urls if url.strip()]
     resultados = []
 
     for url in urls:
-        url = adicionar_prefixo_url(url.strip())
+        url = adicionar_prefixo_url(url)
         if url:
             resultado = analisar_site(url)
             if resultado:
@@ -90,7 +91,7 @@ if st.button("Analisar"):
 
         for i, resultado in enumerate(resultados):
             st.subheader(f"Análise do site {i+1}:")
-            st.write("URL:", urls[i].strip())
+            st.write("URL:", urls[i])
             st.write("Header:", resultado['tem_header'])
             st.write("Autor:", resultado['tem_autor'])
             st.write("Keywords:", resultado['tem_keywords'])
@@ -114,3 +115,4 @@ if st.button("Analisar"):
         st.pyplot(fig)
     else:
         st.warning("Nenhum resultado encontrado.")
+
