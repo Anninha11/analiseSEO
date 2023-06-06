@@ -5,7 +5,6 @@ import streamlit as st
 from bs4 import BeautifulSoup
 import seaborn as sns
 import matplotlib.pyplot as plt
-import io
 from urllib.parse import urlparse
 
 def adicionar_prefixo_url(url):
@@ -19,29 +18,35 @@ def adicionar_prefixo_url(url):
 
     return url
 
-    content = response.content
-    soup = BeautifulSoup(content, 'html.parser')
-    header = soup.find('header')
-    tem_header = bool(header)
-    autor = soup.find('meta', attrs={'name': 'author'})
-    tem_autor = bool(autor)
-    keywords = soup.find('meta', attrs={'name': 'keywords'})
-    tem_keywords = bool(keywords)
-    definicao = soup.find('meta', attrs={'name': 'description'})
-    tem_definicao = bool(definicao)
-    tags_og = soup.find_all('meta', attrs={'property': lambda p: p and p.startswith('og:')})
-    tem_tags_og = len(tags_og) > 0
-    idioma = soup.find('html').get('lang', None)
-    tem_idioma = bool(idioma)
-    resultado = {
-        'tem_header': tem_header,
-        'tem_autor': tem_autor,
-        'tem_keywords': tem_keywords,
-        'tem_definicao': tem_definicao,
-        'tem_tags_og': tem_tags_og,
-        'tem_idioma': tem_idioma
-    }
-    return resultado
+def analisar_site(url):
+    try:
+        response = requests.get(url)
+        content = response.content
+        soup = BeautifulSoup(content, 'html.parser')
+        header = soup.find('header')
+        tem_header = bool(header)
+        autor = soup.find('meta', attrs={'name': 'author'})
+        tem_autor = bool(autor)
+        keywords = soup.find('meta', attrs={'name': 'keywords'})
+        tem_keywords = bool(keywords)
+        definicao = soup.find('meta', attrs={'name': 'description'})
+        tem_definicao = bool(definicao)
+        tags_og = soup.find_all('meta', attrs={'property': lambda p: p and p.startswith('og:')})
+        tem_tags_og = len(tags_og) > 0
+        idioma = soup.find('html').get('lang', None)
+        tem_idioma = bool(idioma)
+        resultado = {
+            'tem_header': tem_header,
+            'tem_autor': tem_autor,
+            'tem_keywords': tem_keywords,
+            'tem_definicao': tem_definicao,
+            'tem_tags_og': tem_tags_og,
+            'tem_idioma': tem_idioma
+        }
+        return resultado
+    except requests.exceptions.RequestException:
+        st.error("Ocorreu um erro ao fazer a requisição para a URL.")
+        return None
 
 def calcular_nota_final(resultado):
     nota_final = (
@@ -54,76 +59,46 @@ def calcular_nota_final(resultado):
     )
     return nota_final
 
-def plotar_grafico_analise(df):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    bar_width = 0.2
-    index = np.arange(len(df['Categoria']))
-
-    for i, col in enumerate(df.columns[1:]):
-        ax.bar(index + i * bar_width, df[col], bar_width, label=col)
-
-    ax.set_xlabel('Categorias')
-    ax.set_ylabel('Valores')
-    ax.set_title('Análise de Sites')
-    ax.set_xticks(index + bar_width)
-    ax.set_xticklabels(df['Categoria'])
-    ax.legend()
-
-    st.pyplot(fig)
-
 st.title("Análise de Sites")
 
-num_urls = st.number_input("Quantidade de URLs:", min_value=1, step=1, value=2)
-urls = []
-for i in range(num_urls):
-    url = st.text_input(f"Coloque a URL {i+1}:")
-    urls.append(url)
+with st.form('insere_url'):
+    url_inputs = st.text_input("Coloque as URLs (separadas por vírgula):")
+    botao = st.form_submit_button(label='Analisar')
 
-resultados = []
-notas_finais = []
-for url in urls:
-    resultado = analisar_site(url)
-    if resultado is not None:
-        nota_final = calcular_nota_final(resultado)
-        resultados.append(resultado)
-        notas_finais.append(nota_final)
+if botao:
+    urls = url_inputs.split(",")
+    resultados = []
+    notas_finais = []
 
-if len(resultados) > 0:
-    for i, resultado in enumerate(resultados):
-        st.subheader(f"Análise do site {i+1}:")
-        st.write("URL:", urls[i])
-        st.write("Header:", resultado['tem_header'])
-        st.write("Autor:", resultado['tem_autor'])
-        st.write("Keywords:", resultado['tem_keywords'])
-        st.write("Definição:", resultado['tem_definicao'])
-        st.write("Tags 'og':", resultado['tem_tags_og'])
-        st.write("Definição de idioma:", resultado['tem_idioma'])
-        st.write("")
+    for url in urls:
+        url = adicionar_prefixo_url(url.strip())
+        if url:
+            resultado = analisar_site(url)
+            if resultado:
+                resultados.append(resultado)
+                nota_final = calcular_nota_final(resultado)
+                notas_finais.append(nota_final)
 
-    for i, nota_final in enumerate(notas_finais):
-        st.subheader(f"Nota Final do site {i+1}:")
-        st.write(nota_final)
-        st.write("")
+    if resultados:
+        st.subheader("Resultados da Análise:")
 
-    resultado_geral = {}
-    for categoria in ['tem_header', 'tem_autor', 'tem_keywords', 'tem_definicao', 'tem_tags_og', 'tem_idioma']:
-        resultado_geral[categoria] = sum(resultado[categoria] for resultado in resultados)
-
-    categorias = ['Header', 'Autor', 'Keywords', 'Definição', 'Tags "og"', 'Idioma']
-    valores_sites = []
-    for resultado in resultados:
-        valores_site = []
-        for categoria in categorias:
-            if categoria in resultado:
-                valores_site.append(resultado[categoria])
-            else:
-                valores_site.append(0)
-        valores_sites.append(valores_site)
-    valores_geral = [resultado_geral[categoria] for categoria in categorias]
-
-    df = pd.DataFrame({'Categoria': categorias})
-    for i, url in enumerate(urls):
-        df[f'Site {i+1}'] = valores_sites[i]
-    df['Sites'] = valores_geral
-
-    plotar_grafico_analise(df)
+        for i, resultado in enumerate(resultados):
+            st.subheader(f"Análise do site {i+1}:")
+            st.write("URL:", urls[i].strip())
+            st.write("Header:", resultado['tem_header'])
+            st.write("Autor:", resultado['tem_autor'])
+            st.write("Keywords:", resultado['tem_keywords'])
+            st.write("Definição:", resultado['tem_definicao'])
+            st.write("Tags 'og':", resultado['tem_tags_og'])
+            st.write("Definição de idioma:", resultado['tem_idioma'])
+            st.write("Nota Final:", notas_finais[i])
+            st.write("---")
+        
+        st.subheader("Gráfico de Notas Finais")
+        df = pd.DataFrame({'URL': urls, 'Nota Final': notas_finais})
+        fig, ax = plt.subplots()
+        sns.barplot(x='URL', y='Nota Final', data=df, ax=ax)
+        plt.xticks(rotation=90)
+        st.pyplot(fig)
+    else:
+        st.warning("Nenhum resultado encontrado.")
