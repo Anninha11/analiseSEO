@@ -61,12 +61,10 @@ def calcular_nota_final(resultado):
 
 st.title("Análise de Sites")
 
-with st.form('insere_url'):
-    url_inputs = st.text_input("Coloque as URLs (separadas por vírgula):")
-    botao = st.form_submit_button(label='Analisar')
+urls = st.text_area("Coloque as URLs (uma por linha):")
 
-if botao:
-    urls = url_inputs.split(",")
+if st.button("Analisar"):
+    urls = urls.split("\n")
     resultados = []
     notas_finais = []
 
@@ -93,7 +91,7 @@ if botao:
             st.write("Definição de idioma:", resultado['tem_idioma'])
             st.write("Nota Final:", notas_finais[i])
             st.write("---")
-        
+
         st.subheader("Gráfico de Notas Finais")
         df = pd.DataFrame({'URL': urls, 'Nota Final': notas_finais})
         fig, ax = plt.subplots()
@@ -102,3 +100,4 @@ if botao:
         st.pyplot(fig)
     else:
         st.warning("Nenhum resultado encontrado.")
+
