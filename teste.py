@@ -84,11 +84,12 @@ for i in range(num_urls):
 resultados = []
 notas_finais = []
 for url in urls:
-    resultado = analisar_site(url)
-    if resultado is not None:
-        nota_final = calcular_nota_final(resultado)
-        resultados.append(resultado)
-        notas_finais.append(nota_final)
+    if url:
+        resultado = analisar_site(url)
+        if resultado is not None:
+            nota_final = calcular_nota_final(resultado)
+            resultados.append(resultado)
+            notas_finais.append(nota_final)
 
 if len(resultados) > 0:
     for i, resultado in enumerate(resultados):
