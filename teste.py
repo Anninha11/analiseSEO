@@ -44,86 +44,68 @@ def calcular_nota_final(resultado):
     )  
     return nota_final
 
-st.title("Análise de Sites")
-
-with st.form('insere_url'):
-    url1 = st.text_input("Coloque a URL 1:")
-    url2 = st.text_input("Coloque a URL 2:")
-    botao = st.form_submit_button(label='Analisar')
-
-if botao:
-    resultado1 = analisar_site(url1)
-    resultado2 = analisar_site(url2)
-    
-    st.subheader("Análise do site 1:")
-    st.write("URL:", url1)
-    st.write("Header:", resultado1['tem_header'])
-    st.write("Autor:", resultado1['tem_autor'])
-    st.write("Keywords:", resultado1['tem_keywords'])
-    st.write("Definição:", resultado1['tem_definicao'])
-    st.write("Tags 'og':", resultado1['tem_tags_og'])
-    st.write("Definição de idioma:", resultado1['tem_idioma'])
-    st.write("")
-
-    st.subheader("Análise do site 2:")
-    st.write("URL:", url2)
-    st.write("Header:", resultado2['tem_header'])
-    st.write("Autor:", resultado2['tem_autor'])
-    st.write("Keywords:", resultado2['tem_keywords'])
-    st.write("Definição:", resultado2['tem_definicao'])
-    st.write("Tags 'og':", resultado2['tem_tags_og'])
-    st.write("Definição de idioma:", resultado2['tem_idioma'])
-    st.write("")
-
-    nota_final1 = calcular_nota_final(resultado1)
-    nota_final2 = calcular_nota_final(resultado2)
-    
-    st.subheader("Resultado:")
-    st.write("Nota Final do site 1:", nota_final1)
-    st.write("Nota Final do site 2:", nota_final2)
-
-    
-    
-    resultado_site1 = resultado1
-    resultado_site2 = resultado2
-    resultado_site1_e_2 = {
-    'tem_header': resultado_site1['tem_header'] + resultado_site2['tem_header'],
-    'tem_autor': resultado_site1['tem_autor'] + resultado_site2['tem_autor'],
-    'tem_keywords': resultado_site1['tem_keywords'] + resultado_site2['tem_keywords'],
-    'tem_definicao': resultado_site1['tem_definicao'] + resultado_site2['tem_definicao'],
-    'tem_tags_og': resultado_site1['tem_tags_og'] + resultado_site2['tem_tags_og'],
-    'tem_idioma': resultado_site1['tem_idioma'] + resultado_site2['tem_idioma']
-}
-
-    
-    
-    
-    
-    categorias = ['Header', 'Autor', 'Keywords', 'Definição', 'Tags "og"', 'Idioma']
-    valores_site1 = [resultado_site1['tem_header'], resultado_site1['tem_autor'], resultado_site1['tem_keywords'],
-                     resultado_site1['tem_definicao'], resultado_site1['tem_tags_og'], resultado_site1['tem_idioma']]
-    valores_site2 = [resultado_site2['tem_header'], resultado_site2['tem_autor'], resultado_site2['tem_keywords'],
-                     resultado_site2['tem_definicao'], resultado_site2['tem_tags_og'], resultado_site2['tem_idioma']]
-    valores_site1_e_2 = [resultado_site1_e_2['tem_header'], resultado_site1_e_2['tem_autor'],
-                         resultado_site1_e_2['tem_keywords'], resultado_site1_e_2['tem_definicao'],
-                         resultado_site1_e_2['tem_tags_og'], resultado_site1_e_2['tem_idioma']]
-
-    df = pd.DataFrame({'Categoria': categorias, 'Site 1': valores_site1, 'Site 2': valores_site2,
-                       'Site 1 e 2': valores_site1_e_2})
-
+def plotar_grafico_analise(df):
     fig, ax = plt.subplots(figsize=(10, 6))
     bar_width = 0.2
-    index = np.arange(len(categorias))
+    index = np.arange(len(df['Categoria']))
 
-    ax.bar(index, df['Site 1'], bar_width, label='Site 1')
-    ax.bar(index + bar_width, df['Site 2'], bar_width, label='Site 2')
-    ax.bar(index + 2 * bar_width, df['Site 1 e 2'], bar_width, label='Site 1 e 2')
+    for i, col in enumerate(df.columns[1:]):
+        ax.bar(index + i * bar_width, df[col], bar_width, label=col)
 
     ax.set_xlabel('Categorias')
     ax.set_ylabel('Valores')
     ax.set_title('Análise de Sites')
     ax.set_xticks(index + bar_width)
-    ax.set_xticklabels(categorias)
+    ax.set_xticklabels(df['Categoria'])
     ax.legend()
 
     st.pyplot(fig)
+
+st.title("Análise de Sites")
+
+num_urls = st.number_input("Quantidade de URLs:", min_value=1, step=1, value=2)
+urls = []
+for i in range(num_urls):
+    url = st.text_input(f"Coloque a URL {i+1}:")
+    urls.append(url)
+
+resultados = []
+notas_finais = []
+for url in urls:
+    resultado = analisar_site(url)
+    nota_final = calcular_nota_final(resultado)
+    resultados.append(resultado)
+    notas_finais.append(nota_final)
+
+for i, resultado in enumerate(resultados):
+    st.subheader(f"Análise do site {i+1}:")
+    st.write("URL:", urls[i])
+    st.write("Header:", resultado['tem_header'])
+    st.write("Autor:", resultado['tem_autor'])
+    st.write("Keywords:", resultado['tem_keywords'])
+    st.write("Definição:", resultado['tem_definicao'])
+    st.write("Tags 'og':", resultado['tem_tags_og'])
+    st.write("Definição de idioma:", resultado['tem_idioma'])
+    st.write("")
+
+for i, nota_final in enumerate(notas_finais):
+    st.subheader(f"Nota Final do site {i+1}:")
+    st.write(nota_final)
+    st.write("")
+
+resultado_geral = {}
+for categoria in ['tem_header', 'tem_autor', 'tem_keywords', 'tem_definicao', 'tem_tags_og', 'tem_idioma']:
+    resultado_geral[categoria] = sum(resultado[categoria] for resultado in resultados)
+
+categorias = ['Header', 'Autor', 'Keywords', 'Definição', 'Tags "og"', 'Idioma']
+valores_sites = []
+for resultado in resultados:
+    valores_sites.append([resultado[categoria] for categoria in categorias])
+valores_geral = [resultado_geral[categoria] for categoria in categorias]
+
+df = pd.DataFrame({'Categoria': categorias})
+for i, url in enumerate(urls):
+    df[f'Site {i+1}'] = valores_sites[i]
+df['Sites'] = valores_geral
+
+plotar_grafico_analise(df)
