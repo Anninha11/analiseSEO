@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import seaborn as sns
 import matplotlib.pyplot as plt
 import io
+from urllib.parse import urlparse
 
 def adicionar_prefixo_url(url):
     try:
