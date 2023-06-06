@@ -7,11 +7,14 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import io
 
-def analisar_site(url):
+def adicionar_prefixo_url(url):
     if not url.startswith(('http://', 'https://')):
-        st.error("URL inválida. Certifique-se de incluir um esquema válido (por exemplo, 'http://' ou 'https://').")
-        return None
-    
+        url = 'http://' + url
+    return url
+
+def analisar_site(url):
+    url = adicionar_prefixo_url(url)
+
     try:
         response = requests.get(url)
     except requests.exceptions.RequestException:
@@ -50,7 +53,7 @@ def calcular_nota_final(resultado):
         resultado['tem_definicao'] +
         resultado['tem_tags_og'] +
         resultado['tem_idioma']
-    )  
+    )
     return nota_final
 
 def plotar_grafico_analise(df):
@@ -126,4 +129,3 @@ if len(resultados) > 0:
     df['Sites'] = valores_geral
 
     plotar_grafico_analise(df)
-
