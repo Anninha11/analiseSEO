@@ -8,7 +8,12 @@ import matplotlib.pyplot as plt
 import io
 
 def analisar_site(url):
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except requests.exceptions.MissingSchema:
+        st.error("URL inválida. Certifique-se de incluir um esquema válido (por exemplo, 'http://' ou 'https://').")
+        return None
+
     content = response.content
     soup = BeautifulSoup(content, 'html.parser')
     header = soup.find('header')
@@ -73,20 +78,24 @@ resultados = []
 notas_finais = []
 for url in urls:
     resultado = analisar_site(url)
-    nota_final = calcular_nota_final(resultado)
-    resultados.append(resultado)
-    notas_finais.append(nota_final)
+    if resultado is not None:
+        nota_final = calcular_nota_final(resultado)
+        resultados.append(resultado)
+        notas_finais.append(nota_final)
 
-for i, resultado in enumerate(resultados):
-    st.subheader(f"Análise do site {i+1}:")
-    st.write("URL:", urls[i])
-    st.write("Header:", resultado['tem_header'])
-    st.write("Autor:", resultado['tem_autor'])
-    st.write("Keywords:", resultado['tem_keywords'])
-    st.write("Definição:", resultado['tem_definicao'])
-    st.write("Tags 'og':", resultado['tem_tags_og'])
-    st.write("Definição de idioma:", resultado['tem_idioma'])
-    st.write("")
+    st.subheader(f"Análise do site {url}:")
+    if resultado is not None:
+        st.write("URL:", url)
+        st.write("Header:", resultado['tem_header'])
+        st.write("Autor:", resultado['tem_autor'])
+        st.write("Keywords:", resultado['tem_keywords'])
+        st.write("Definição:", resultado['tem_definicao'])
+        st.write("Tags 'og':", resultado['tem_tags_og'])
+        st.write("Definição de idioma:", resultado['tem_idioma'])
+        st.write("")
+    else:
+        st.write("URL inválida. Certifique-se de incluir um esquema válido (por exemplo, 'http://' ou 'https://').")
+        st.write("")
 
 for i, nota_final in enumerate(notas_finais):
     st.subheader(f"Nota Final do site {i+1}:")
